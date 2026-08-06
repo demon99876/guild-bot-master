@@ -6,6 +6,7 @@ from flask import Flask
 app = Flask(__name__)
 
 FONNTE_TOKEN = os.environ.get('FONNTE_TOKEN')
+print("TOKEN TERBACA:", os.getenv("FONNTE_TOKEN"))
 ADMIN = "6288225622133"
 DATA_FILE = "data.json"
 
