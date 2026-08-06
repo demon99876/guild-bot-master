@@ -38,22 +38,22 @@ def webhook():
         return "OK", 200
 
     req = request.get_json()
-    print("DATA MASUK:", req) # TAMBAH INI BUAT DEBUG
+    print("DATA MASUK:", req)
     
-    # GANTI 2 BARIS INI
-    sender_data = req.get('sender') # sender sekarang dict
-    message = req.get('message', '').strip()
+    sender_data = req.get('sender', {})
+    message = req.get('message', {}).get('text', '').strip() # INI YANG DIGANTI
+    sender_id = sender_data.get('id')
 
-    if message.startswith('!help'):
-        sender_id = sender_data.get('id') # AMBIL ID NYA DISINI
+    print(f"PESAN DARI: {sender_id} ISI: {message}") # TAMBAH INI
+
+    if message.lower().startswith('!help'):
         balasan = """*BOT GUILD AING*
 !id Nama|IDFF - Daftar ID
 !list - Lihat daftar
 !absen - Absen
 !resetabsen - Reset absen [Admin]"""
-        kirim_pesan(sender_id, balasan) # PAKE sender_id
-        return "OK", 200
-
+        kirim_pesan(sender_id, balasan)
+    
     return "OK", 200
 
 if __name__ == "__main__":
