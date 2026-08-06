@@ -1,59 +1,44 @@
-import requests
-import time
 import os
-from threading import Thread
+import time
+import requests
+import threading
+from main import kirim_pesan, load_data, save_data
 
-FONNTE_TOKEN = os.getenv("FONNTE_TOKEN")
-DEVICE = "6288225622133"
-CHECK_INTERVAL = 3
+FONNTE_TOKEN = os.environ.get('FONNTE_TOKEN')
 
-last_message_id = None
+def proses_pesan(data):
+    if data['sender'] == '6288225622133@c.us':
+        return
 
-def get_messages():
-    global last_message_id
-    url = "https://api.fonnte.com/message"
-    headers = {"Authorization": FONNTE_TOKEN}
-    data = {"device": DEVICE}
-    
-    try:
-        res = requests.post(url, headers=headers, data=data)
-        res.raise_for_status()
-        messages = res.json().get("data", [])
-        
-        for msg in messages:
-            msg_id = msg.get("id")
-            if msg_id!= last_message_id:
-                last_message_id = msg_id
-                sender = msg.get("sender")
-                text = msg.get("message")
-                
-                print(f"PESAN DARI: {sender} ISI: {text}")
-                process_command(sender, text)
-                
-    except Exception as e:
-        print(f"Error poller: {e}")
+    nomor = data['sender'].replace('@c.us','')
+    pesan = data['message'].strip()
+    data_bot = load_data()
+    if pesan.startswith('!id '):
+        try:            _, isi = pesan.split('!id ', 1)
+            nama, id_ = isi.split('|')
+            data_bot['list'][nomor] = {'nama': nama, 'id': id_}
+            save_data(data_bot)
+            kirim_pesan(nomor, f"Siap {nama}! ID {id_} terdaftar ✅")
 
-def process_command(sender, text):
-    if text.startswith("!id"):
-        parts = text.split("|")
-        if len(parts) == 2:
-            nama = parts[0].replace("!id ", "")
-            id_game = parts[1]
-            print(f"DAFTAR BARU: {nama} - {id_game}")
-            send_message(sender, f"Siap {nama}! ID {id_game} sudah terdaftar ✅")
-    elif text == "!help":
-        send_message(sender, "Ketik:!id Nama|ID_Game")
+            print(f"DAFTAR BARU: {nama} - {id_}")
+        except:
+            kirim_pesan(nomor, "Format salah. Pakai:!id Nama|ID")
 
-def send_message(to, message):
-    url = "https://api.fonnte.com/send"
-    headers = {"Authorization": FONNTE_TOKEN}
-    data = {"target": to, "message": message}
-    requests.post(url, headers=headers, data=data)
-
-def start_poller():
+def cek_pesan():
     print("Poller Fonnte dimulai...")
+    last_id = 0
     while True:
-        get_messages()
-        time.sleep(CHECK_INTERVAL)
+        try:
+            r = requests.get(f"https://api.fonnte.com/inbox?token={FONNTE_TOKEN}")
+            if r.status_code == 200:
+                msgs = r.json().get('data', [])
+                for msg in msgs:
+                    if msg['id'] > last_id:
+                        last_id = msg['id']
+                        print("PESAN MASUK:", msg['sender'], msg['message'])
+                        proses_pesan(msg)
+        except Exception as e:
+            print("ERROR:", e)
+        time.sleep(2)
 
-Thread(target=start_poller, daemon=True).start()
+threading.Thread(target=cek_pesan, daemon=True).start()
