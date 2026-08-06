@@ -1,4 +1,4 @@
-import os
+ import os
 import time
 import requests
 import threading
@@ -13,14 +13,13 @@ def proses_pesan(data):
     nomor = data['sender'].replace('@c.us','')
     pesan = data['message'].strip()
     data_bot = load_data()
-    if pesan.startswith('!id '):
-        try:            
+   if pesan.startswith('!id '):       
+           try:
             _, isi = pesan.split('!id ', 1)
             nama, id_ = isi.split('|')
             data_bot['list'][nomor] = {'nama': nama, 'id': id_}
             save_data(data_bot)
             kirim_pesan(nomor, f"Siap {nama}! ID {id_} terdaftar ✅")
-
             print(f"DAFTAR BARU: {nama} - {id_}")
         except:
             kirim_pesan(nomor, "Format salah. Pakai:!id Nama|ID")
