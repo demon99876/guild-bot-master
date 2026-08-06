@@ -39,4 +39,8 @@ def webhook():
 !list - Lihat daftar
 !absen - Absen
 !resetabsen - Reset absen [Admin]"""
-        kirim_pesan(sender) 
+        kirim_pesan(sender,balasan) 
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
