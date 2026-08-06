@@ -41,9 +41,15 @@ def keep_alive():
         except: print("PING GAGAL")
         time.sleep(300)
 
+def run_flask():
+    import os
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
+
 if __name__ == '__main__':
     Thread(target=poller, daemon=False).start()
-Thread(target=keep_alive, daemon=False).start()
-    import os
-port = int(os.environ.get("PORT", 8080))
-app.run(host='0.0.0.0', port=port)
+    Thread(target=keep_alive, daemon=False).start()
+    Thread(target=run_flask, daemon=False).start()
+    
+    while True: # biar ga mati
+        time.sleep(1)
