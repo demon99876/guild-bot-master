@@ -23,7 +23,11 @@ def kirim_pesan(target, pesan):
     url = "https://api.fonnte.com/send"
     payload = {"target": target, "message": pesan}
     headers = {"Authorization": FONNTE_TOKEN}
-    requests.post(url, data=payload, headers=headers)
+    r = requests.post(url, data=payload, headers=headers)
+    print("MAU KIRIM KE:", target)
+    print("PAKE TOKEN:", FONNTE_TOKEN[:10] + "...") # cuma nampilin 10 digit pertama
+    print("STATUS:", r.status_code)
+    print("RESPON FONNTE:", r.text)
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
