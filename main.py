@@ -5,6 +5,9 @@ from flask import Flask
 from threading import Thread
 
 app = Flask(__name__)
+@app.route("/")
+def home():
+    return "Bot Aing Jalan"
 FONNTE_TOKEN = os.environ.get("FONNTE_TOKEN")
 print(f"TOKEN TERBACA: {FONNTE_TOKEN}")
 last_message_id = None
