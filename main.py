@@ -39,4 +39,4 @@ def webhook():
 !list - Lihat daftar
 !absen - Absen
 !resetabsen - Reset absen [Admin]"""
-        kirim_pesan(sender
+        kirim_pesan(sender) 
