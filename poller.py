@@ -9,7 +9,6 @@ FONNTE_TOKEN = os.environ.get('FONNTE_TOKEN')
 def proses_pesan(data):
     if data['sender'] == '6288225622133@c.us':
         return
-
     nomor = data['sender'].replace('@c.us','')
     pesan = data['message'].strip()
     data_bot = load_data()
