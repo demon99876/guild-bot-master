@@ -30,7 +30,7 @@ def kirim_pesan(target, pesan):
     requests.post(url, data=payload, headers=headers)
 
 def cek_pesan():
-    url = "https://api.fonnte.com/get-message" # <-- INI TADI url1 kamu benerin jadi url
+    url = "https://api.fonnte.com/get-message" #
     headers = {"Authorization": FONNTE_TOKEN}
     try:
         r = requests.get(url, headers=headers, timeout=10)
@@ -65,5 +65,4 @@ def poller(): # <-- INI MESIN BIAR GA MATI
         time.sleep(2)
 
 if __name__ == '__main__':
-    Thread(target=poller, daemon=True).start() # <-- JALANIN POLLER
-    app.run(host='0.0.0.0', port=8080) # <-- JALANIN FLASK
+    Thread(target=poller, daemon=True).start()
