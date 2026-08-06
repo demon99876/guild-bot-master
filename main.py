@@ -27,8 +27,11 @@ def kirim_pesan(target, pesan):
     headers = {"Authorization": FONNTE_TOKEN}
     requests.post(url, data=payload, headers=headers)
 
-@app.route('/api/webhook', methods=['POST'])
+@app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
+    if request.method == 'GET':
+        return "OK", 200
+        
     req = request.get_json()
     sender = req.get('sender')
     message = req.get('message', '').strip()
