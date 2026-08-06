@@ -41,12 +41,11 @@ def keep_alive():
         except: print("PING GAGAL")
         time.sleep(300)
 
+# JALANIN THREAD OTOMATIS PAS DIIMPORT
+Thread(target=poller, daemon=False).start()
+Thread(target=keep_alive, daemon=False).start()
+
 if __name__ == '__main__':
-    # JALANIN POLLER DULU
-    Thread(target=poller, daemon=False).start()
-    Thread(target=keep_alive, daemon=False).start()
-    
-    # BARU JALANIN FLASK
     import os
     port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
