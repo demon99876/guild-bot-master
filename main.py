@@ -1,68 +1,43 @@
 import os
-import json
-import requests
 import time
+import requests
 from flask import Flask
 from threading import Thread
 
 app = Flask(__name__)
+FONNTE_TOKEN = os.environ.get("FONNTE_TOKEN")
+print(f"TOKEN TERBACA: {FONNTE_TOKEN}")
+last_message_id = None
 
-FONNTE_TOKEN = os.environ.get('FONNTE_TOKEN')
-print("TOKEN TERBACA:", FONNTE_TOKEN)
-ADMIN = "6288225622133"
-DATA_FILE = "data.json"
+def kirim_pesan(nomor, pesan):
+    requests.post("https://api.fonnte.com/send", headers={"Authorization": FONNTE_TOKEN}, data={"target": nomor, "message": pesan})
 
-def load_data():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r') as f:
-            return json.load(f)
-    return {"list": {}, "absen": []}
-
-def save_data(data):
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data, f)
-
-def kirim_pesan(target, pesan):
-    target = target.replace("@c.us", "")
-    url = "https://api.fonnte.com/send"
-    payload = {"target": target, "message": pesan}
-    headers = {"Authorization": FONNTE_TOKEN}
-    requests.post(url, data=payload, headers=headers)
-
-def cek_pesan():
-    url = "https://api.fonnte.com/get-message" #
-    headers = {"Authorization": FONNTE_TOKEN}
-    try:
-        r = requests.get(url, headers=headers, timeout=10)
-        if r.status_code == 200:
-            data = r.json()
-            if data.get("status") and data.get("data"):
-                for msg in data["data"]:
-                    sender = msg["sender"]
-                    text = msg["message"]
-                    print("PESAN MASUK:", sender, text)
-                    
-                    if text.startswith("!id"):
-                        try:
-                            nama, id_guild = text.split("|")
-                            nama = nama.replace("!id ", "")
-                            data = load_data()
-                            data["list"][sender] = {"nama": nama, "id": id_guild}
-                            save_data(data)
-                            kirim_pesan(sender, f"Siap {nama}! ID {id_guild} terdaftar ✅")
-                        except:
-                            kirim_pesan(sender, "Format salah. Pake:!id nama|ID")
-    except: 
-        pass
-
-@app.route('/')
-def home():
-    return "Bot Jalan"
-
-def poller(): # <-- INI MESIN BIAR GA MATI
+def poller():
+    global last_message_id
+    print("Poller dimulai...")
     while True:
-        cek_pesan()
-        time.sleep(2)
+        try:
+            res = requests.get(f"https://api.fonnte.com/getMessages?token={FONNTE_TOKEN}").json()
+            if res.get("status") and res.get("data"):
+                pesan_terbaru = res["data"][0]
+                if pesan_terbaru.get("id")!= last_message_id:
+                    last_message_id = pesan_terbaru.get("id")
+                    nomor = pesan_terbaru.get("from")
+                    teks = pesan_terbaru.get("message")
+                    print(f"PESAN MASUK: {nomor} {teks}")
+                    if teks.startswith("!id aing|"):
+                        kirim_pesan(nomor, f"Siap aing! ID {teks.split('|')[1]} terdaftar ✅")
+        except: pass
+        time.sleep(3)
+
+def keep_alive():
+    while True:
+        try:
+            requests.get("https://web-production-52a5b.up.railway.app")
+            print("PING RAILWAY OK")
+        except: print("PING GAGAL")
+        time.sleep(300)
 
 if __name__ == '__main__':
     Thread(target=poller, daemon=True).start()
+    Thread(target=keep_alive, daemon=True).start()
