@@ -14,7 +14,8 @@ def proses_pesan(data):
     pesan = data['message'].strip()
     data_bot = load_data()
     if pesan.startswith('!id '):
-        try:            _, isi = pesan.split('!id ', 1)
+        try:            
+            _, isi = pesan.split('!id ', 1)
             nama, id_ = isi.split('|')
             data_bot['list'][nomor] = {'nama': nama, 'id': id_}
             save_data(data_bot)
