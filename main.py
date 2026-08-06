@@ -19,8 +19,6 @@ def save_data(data):
     with open(DATA_FILE, 'w') as f:
         json.dump(data, f)
 
-data = load_data()
-
 def kirim_pesan(target, pesan):
     url = "https://api.fonnte.com/send"
     payload = {"target": target, "message": pesan}
@@ -42,7 +40,11 @@ def webhook():
 !list - Lihat daftar
 !absen - Absen
 !resetabsen - Reset absen [Admin]"""
-        kirim_pesan(sender,balasan) 
+        kirim_pesan(sender,balasan)
+        return "OK", 200
+
+    return "OK", 200
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
