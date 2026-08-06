@@ -13,8 +13,8 @@ def proses_pesan(data):
     nomor = data['sender'].replace('@c.us','')
     pesan = data['message'].strip()
     data_bot = load_data()
-   if pesan.startswith('!id '):       
-           try:
+    if pesan.startswith('!id '):
+        try:
             _, isi = pesan.split('!id ', 1)
             nama, id_ = isi.split('|')
             data_bot['list'][nomor] = {'nama': nama, 'id': id_}
