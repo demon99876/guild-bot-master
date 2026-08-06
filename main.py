@@ -44,4 +44,6 @@ def keep_alive():
 if __name__ == '__main__':
     Thread(target=poller, daemon=True).start()
     Thread(target=keep_alive, daemon=True).start()
-    app.run(host='0.0.0.0', port=8080)
+    import os
+port = int(os.environ.get("PORT", 8080))
+app.run(host='0.0.0.0', port=port)
