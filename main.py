@@ -1,12 +1,13 @@
+import poller
 import os
 import json
-from flask import Flask, request, jsonify
 import requests
+from flask import Flask
 
 app = Flask(__name__)
 
 FONNTE_TOKEN = os.environ.get('FONNTE_TOKEN')
-ADMIN = "6288225622133" # GANTI INI PAKE NOMER KAMU YA
+ADMIN = "6288225622133"
 DATA_FILE = "data.json"
 
 def load_data():
@@ -20,42 +21,16 @@ def save_data(data):
         json.dump(data, f)
 
 def kirim_pesan(target, pesan):
-    # TAMBAH 1 BARIS INI
     target = target.replace("@c.us", "").replace("@s.whatsapp.net", "")
-    
     url = "https://api.fonnte.com/send"
     payload = {"target": target, "message": pesan}
     headers = {"Authorization": FONNTE_TOKEN}
     r = requests.post(url, data=payload, headers=headers)
-    print("MAU KIRIM KE:", target)
-    print("PAKE TOKEN:", FONNTE_TOKEN[:10] + "...")
-    print("STATUS:", r.status_code)
-    print("RESPON FONNTE:", r.text)
+    print("STATUS KIRIM:", r.status_code)
 
-@app.route('/webhook', methods=['GET', 'POST'])
-def webhook():
-    if request.method == 'GET':
-        return "OK", 200
+@app.route('/')
+def home():
+    return "Bot Jalan"
 
-    req = request.get_json()
-    print("DATA MASUK:", req)
-    
-    sender_data = req.get('sender', {})
-    message = req.get('message', {}).get('text', '').strip() # INI YANG DIGANTI
-    sender_id = sender_data.get('id')
-
-    print(f"PESAN DARI: {sender_id} ISI: {message}") # TAMBAH INI
-
-    if message.lower().startswith('!help'):
-        balasan = """*BOT GUILD AING*
-!id Nama|IDFF - Daftar ID
-!list - Lihat daftar
-!absen - Absen
-!resetabsen - Reset absen [Admin]"""
-        kirim_pesan(sender_id, balasan)
-    
-    return "OK", 200
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
