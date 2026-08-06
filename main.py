@@ -20,12 +20,15 @@ def save_data(data):
         json.dump(data, f)
 
 def kirim_pesan(target, pesan):
+    # TAMBAH 1 BARIS INI
+    target = target.replace("@c.us", "").replace("@s.whatsapp.net", "")
+    
     url = "https://api.fonnte.com/send"
     payload = {"target": target, "message": pesan}
     headers = {"Authorization": FONNTE_TOKEN}
     r = requests.post(url, data=payload, headers=headers)
     print("MAU KIRIM KE:", target)
-    print("PAKE TOKEN:", FONNTE_TOKEN[:10] + "...") # cuma nampilin 10 digit pertama
+    print("PAKE TOKEN:", FONNTE_TOKEN[:10] + "...")
     print("STATUS:", r.status_code)
     print("RESPON FONNTE:", r.text)
 
@@ -33,22 +36,25 @@ def kirim_pesan(target, pesan):
 def webhook():
     if request.method == 'GET':
         return "OK", 200
-        
+
     req = request.get_json()
-    sender = req.get('sender')
+    print("DATA MASUK:", req) # TAMBAH INI BUAT DEBUG
+    
+    # GANTI 2 BARIS INI
+    sender_data = req.get('sender') # sender sekarang dict
     message = req.get('message', '').strip()
 
     if message.startswith('!help'):
+        sender_id = sender_data.get('id') # AMBIL ID NYA DISINI
         balasan = """*BOT GUILD AING*
 !id Nama|IDFF - Daftar ID
 !list - Lihat daftar
 !absen - Absen
 !resetabsen - Reset absen [Admin]"""
-        kirim_pesan(sender,balasan)
+        kirim_pesan(sender_id, balasan) # PAKE sender_id
         return "OK", 200
 
     return "OK", 200
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
